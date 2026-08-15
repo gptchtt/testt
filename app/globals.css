@@ -1,0 +1,63 @@
+:root {
+  --plum-deep: #23111f;
+  --plum-mid: #34182f;
+  --plum-soft: #3f2039;
+  --gold: #c9a24b;
+  --gold-soft: #e3c887;
+  --blush: #d98c97;
+  --cream: #f4eade;
+  --ink: #efe3d3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--plum-deep);
+  color: var(--ink);
+  font-family: "Cairo", sans-serif;
+  overflow-x: hidden;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(201, 162, 75, 0.08), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(217, 140, 151, 0.08), transparent 45%);
+}
+
+h1, h2, h3 {
+  font-family: "Aref Ruqaa", serif;
+  font-weight: 700;
+  margin: 0;
+}
+
+.letter-text {
+  font-family: "Amiri", serif;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
