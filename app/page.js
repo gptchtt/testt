@@ -1,131 +1,176 @@
 "use client";
 
-import { motion } from "framer-motion";
-import content from "../content.config.js";
-import PhotoGallery from "./components/PhotoGallery.js";
-import SongPlayer from "./components/SongPlayer.js";
-import LoveLetters from "./components/LoveLetters.js";
-import FloatingHearts from "./components/FloatingHearts.js";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import content from "../../content.config.js";
+import MatrixHeartOverlay from "../components/MatrixHeartOverlay.js";
 
-export default function Home() {
-  const featuredPhoto = content.photos?.[0];
+export default function UnlockPage() {
+  const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | checking | wrong | success
+  const initial = content.recipientName?.trim()?.charAt(0) || "♥";
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (status === "checking" || status === "success") return;
+    setStatus("checking");
+
+    try {
+      const res = await fetch("/api/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+
+      if (res.ok) {
+        setStatus("success");
+        setTimeout(() => {
+          router.push("/");
+          router.refresh();
+        }, 2300);
+      } else {
+        setStatus("wrong");
+        setTimeout(() => setStatus("idle"), 900);
+      }
+    } catch {
+      setStatus("wrong");
+      setTimeout(() => setStatus("idle"), 900);
+    }
+  }
 
   return (
-    <main>
-      <section
+    <main
+      style={{
+        minHeight: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+        gap: "28px",
+        textAlign: "center",
+        position: "relative"
+      }}
+    >
+      <motion.p
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 0.75, y: 0 }}
+        transition={{ duration: 0.8 }}
         style={{
-          position: "relative",
-          minHeight: "94dvh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "36px 20px 20px",
-          gap: 14,
-          overflow: "hidden"
+          fontFamily: "Amiri, serif",
+          fontStyle: "italic",
+          color: "var(--gold-soft)",
+          fontSize: "1.1rem",
+          letterSpacing: "0.5px"
         }}
       >
-        <FloatingHearts count={14} />
+        رسالة مقفولة باسمك...
+      </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 0.85, y: 0 }}
-          transition={{ duration: 0.8 }}
-          style={{ color: "var(--blush)", letterSpacing: 1, zIndex: 1 }}
-        >
-          لـ {content.recipientName}
-        </motion.p>
+      {/* الختم / الظرف - العنصر المميز في الصفحة */}
+      <motion.div
+        animate={
+          status === "wrong"
+            ? { x: [0, -10, 10, -8, 8, 0] }
+            : status === "success"
+            ? { scale: [1, 1.15, 0] }
+            : {}
+        }
+        transition={{ duration: status === "success" ? 0.7 : 0.45 }}
+        style={{
+          width: 132,
+          height: 132,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold) 55%, #8a6a2c 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow:
+            "0 10px 30px rgba(0,0,0,0.45), inset 0 2px 4px rgba(255,255,255,0.35)",
+          position: "relative"
+        }}
+      >
+        <AnimatePresence mode="wait">
+          {status !== "success" ? (
+            <motion.span
+              key="seal"
+              exit={{ scale: 1.6, opacity: 0, rotate: 12 }}
+              transition={{ duration: 0.5 }}
+              style={{
+                fontFamily: "Aref Ruqaa, serif",
+                fontSize: "2.6rem",
+                color: "var(--plum-deep)"
+              }}
+            >
+              {initial}
+            </motion.span>
+          ) : (
+            <motion.span
+              key="open"
+              initial={{ scale: 0, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              style={{ fontSize: "2rem" }}
+            >
+              💌
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.15 }}
+      <div>
+        <h1 style={{ fontSize: "1.9rem", color: "var(--cream)" }}>
+          {content.recipientName}
+        </h1>
+        <p style={{ opacity: 0.6, marginTop: 6, fontSize: "0.95rem" }}>
+          {status === "success" ? "الختم اتكسر... بيتفتح دلوقتي" : "اكتبي كلمة السر عشان تفتحي الرسالة"}
+        </p>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%", maxWidth: 320 }}
+      >
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={status === "checking" || status === "success"}
+          placeholder="كلمة السر"
           style={{
-            fontSize: "clamp(1.9rem, 6vw, 3rem)",
-            color: "var(--cream)",
-            maxWidth: 640,
-            lineHeight: 1.4,
-            zIndex: 1
+            background: "var(--plum-mid)",
+            border: `1px solid ${status === "wrong" ? "#c05a5a" : "rgba(201,162,75,0.35)"}`,
+            borderRadius: 999,
+            padding: "14px 20px",
+            color: "var(--ink)",
+            fontSize: "1rem",
+            textAlign: "center"
+          }}
+        />
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          type="submit"
+          disabled={status === "checking" || status === "success"}
+          style={{
+            background: "linear-gradient(135deg, var(--gold-soft), var(--gold))",
+            border: "none",
+            borderRadius: 999,
+            padding: "13px 20px",
+            color: "var(--plum-deep)",
+            fontWeight: 600,
+            fontSize: "1rem",
+            opacity: status === "checking" ? 0.7 : 1
           }}
         >
-          {content.heroTitle}
-        </motion.h1>
+          {status === "checking" ? "لحظة..." : status === "success" ? "اتفتحت 🤍" : "افتحي الرسالة"}
+        </motion.button>
+      </form>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="heart-divider"
-          style={{ zIndex: 1 }}
-        >
-          ♥
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
-          transition={{ duration: 0.9, delay: 0.35 }}
-          className="letter-text"
-          style={{ fontSize: "1.05rem", color: "var(--gold-soft)", fontStyle: "italic", zIndex: 1 }}
-        >
-          {content.heroSubtitle}
-        </motion.p>
-
-        {featuredPhoto ? (
-          <motion.div
-            initial={{ opacity: 0, y: 24, rotate: 0 }}
-            animate={{ opacity: 1, y: 0, rotate: -4 }}
-            transition={{ duration: 0.9, delay: 0.5 }}
-            className="hero-photo-frame"
-            style={{ marginTop: 18 }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={featuredPhoto.src} alt={featuredPhoto.caption || "ذكرى"} />
-
-            <motion.span
-              className="sparkle"
-              animate={{ opacity: [0.3, 1, 0.3], scale: [0.9, 1.15, 0.9] }}
-              transition={{ repeat: Infinity, duration: 2.4 }}
-              style={{ top: -14, left: -16, fontSize: "1.6rem" }}
-            >
-              ✦
-            </motion.span>
-            <motion.span
-              className="sparkle"
-              animate={{ opacity: [0.2, 0.9, 0.2], scale: [1, 1.2, 1] }}
-              transition={{ repeat: Infinity, duration: 3, delay: 0.6 }}
-              style={{ bottom: 6, right: -14, fontSize: "1.2rem" }}
-            >
-              ✦
-            </motion.span>
-            <motion.span
-              className="heart-badge"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ repeat: Infinity, duration: 2.6 }}
-              style={{ top: -18, right: -12, fontSize: "1.8rem" }}
-            >
-              ♥
-            </motion.span>
-          </motion.div>
-        ) : null}
-
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2.2 }}
-          style={{ marginTop: 26, color: "var(--gold)", fontSize: "1.3rem", zIndex: 1 }}
-        >
-          ↓
-        </motion.div>
-      </section>
-
-      <PhotoGallery photos={content.photos} />
-      <SongPlayer song={content.song} />
-      <LoveLetters letters={content.loveLetters} signature={content.signature} />
-
-      <footer style={{ textAlign: "center", padding: "30px 20px 50px", opacity: 0.4, fontSize: "0.85rem" }}>
-        صُنعت بحب 🤍
-      </footer>
+      {/* الترانزيشن الكبير: حروف عشوائية بتتجمع تبقي شكل قلب متوهج */}
+      <MatrixHeartOverlay show={status === "success"} label="✨ بتتفتح دلوقتي ✨" />
     </main>
   );
 }
