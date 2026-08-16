@@ -5,10 +5,10 @@
 
 const content = {
   // كلمة السر اللي هي هتدخلها عشان تفتح الموقع
-  password: "totta",
+  password: "test",
 
   // اسمها / العنوان اللي هيظهر في صفحة القفل
-  recipientName: "toz fekyy",
+  recipientName: "ليلى",
 
   // العنوان الرئيسي بعد فتح الموقع
   heroTitle: "لكل لحظة كنتِ فيها السبب",
