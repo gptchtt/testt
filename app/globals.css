@@ -240,3 +240,55 @@ input:focus-visible {
   font-size: 1.4rem;
   color: rgba(201, 162, 75, 0.4);
 }
+
+/* ===== Matrix-style heart transition (big reveal) ===== */
+.matrix-heart-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: radial-gradient(circle at center, #1a0a15 0%, #0c0509 75%);
+  overflow: hidden;
+  padding: 20px;
+}
+
+.matrix-grid {
+  display: grid;
+  gap: 2px;
+  width: min(94vw, 460px);
+  aspect-ratio: 11 / 15;
+}
+
+.matrix-cell {
+  font-family: "Courier New", monospace;
+  font-weight: 600;
+  font-size: clamp(9px, 2.6vw, 15px);
+  line-height: 1;
+  text-align: center;
+  color: rgba(217, 140, 151, 0.22);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.matrix-cell--active {
+  color: #ff6fa5;
+  font-weight: 800;
+  text-shadow:
+    0 0 6px rgba(255, 111, 165, 0.9),
+    0 0 18px rgba(255, 111, 165, 0.6),
+    0 0 32px rgba(255, 111, 165, 0.35);
+}
+
+.matrix-label {
+  font-family: "Aref Ruqaa", serif;
+  font-size: 1.5rem;
+  color: var(--cream);
+  text-shadow: 0 0 14px rgba(255, 111, 165, 0.5);
+  text-align: center;
+}
