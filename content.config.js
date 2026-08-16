@@ -19,7 +19,7 @@ const content = {
   photos: [
     { src: "/images/360_F_536903680_10hquiCjziB2Kux3bVSD1EnC2rdNzSg2.jpg", caption: "أول يوم اتقابلنا فيه" },
     { src: "/images/pexels-jasmine-carter-888899.jpg", caption: "الرحلة اللي مش هتتنسى" },
-    { src: "/images/photo-3.jpg", caption: "ضحكتك المفضلة عندي" },
+    { src: "/images/360_F_354435799_7pxwyGmLhDL4zixqaFDjxm6Q2PnZizYf.jpg", caption: "ضحكتك المفضلة عندي" },
     { src: "/images/photo-4.jpg", caption: "" }
   ],
 
