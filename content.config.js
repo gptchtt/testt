@@ -5,7 +5,7 @@
 
 const content = {
   // كلمة السر اللي هي هتدخلها عشان تفتح الموقع
-  password: "test",
+  password: "tolba",
 
   // اسمها / العنوان اللي هيظهر في صفحة القفل
   recipientName: "ليلى",
